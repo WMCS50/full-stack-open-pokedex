@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
   simple_deployment_pipeline:
@@ -25,7 +28,7 @@ jobs:
       
       - name: Test
         run: npm run test
-        
+
       - name: e2e tests
         uses: cypress-io/github-action@v5
         with:
@@ -34,6 +37,7 @@ jobs:
           wait-on: http://localhost:5000 
 
   deploy_to_fly:
+    if: ${{ github.event_name == 'push' }}
     needs: simple_deployment_pipeline
     runs-on: ubuntu-latest
     concurrency: deploy-group
